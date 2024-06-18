@@ -5,6 +5,7 @@ from uuid import uuid4
 
 import redis
 import telethon
+import telethon.tl.types
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import ForwardMessagesRequest
 from telethon.types import Message, UpdateNewMessage
@@ -48,13 +49,13 @@ Hello! I am a bot to download videos from terabox.
 Send me the terabox link and I will start downloading it.
 Join @RoldexVerse For Updates
 [Source Code](https://github.com/r0ld3x/terabox-downloader-bot) """
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     await event.reply(reply_text, link_preview=False, parse_mode="markdown")
 
@@ -69,13 +70,13 @@ Join @RoldexVerse For Updates
 async def start(event: UpdateNewMessage):
     text = event.pattern_match.group(1)
     fileid = db.get(str(text))
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     await bot(
         ForwardMessagesRequest(
@@ -121,13 +122,13 @@ async def handle_message(event: Message):
     url = get_urls_from_string(event.text)
     if not url:
         return await event.reply("Please enter a valid url.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     is_spam = db.get(event.sender_id)
     if is_spam and event.sender_id not in [1317173146]:
@@ -305,6 +306,7 @@ Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
             ex=7200,
         )
 
+
 # Aiohttp server for health check
 async def handle(request):
     return web.Response(text="Bot is running")
@@ -313,19 +315,19 @@ async def handle(request):
 app = web.Application()
 app.add_routes([web.get("/", handle)])
 
-async def main():
-    await bot.start(bot_token=BOT_TOKEN)
+if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+
+    # Start the bot
+    loop.run_until_complete(bot.start(bot_token=BOT_TOKEN))
     print("Bot is running...")
 
     # Run the web server
     runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, "0.0.0.0", PORT)
-    await site.start()
+    loop.run_until_complete(runner.setup())
+    site = web.TCPSite(runner, "0.0.0.0", int(os.environ.get("PORT", 8000)))
+    loop.run_until_complete(site.start())
 
     # Keep the loop running
-    await bot.run_until_disconnected()
+    loop.run_forever()
 
-if __name__ == "__main__":
-    asyncio.run(main())
-    
