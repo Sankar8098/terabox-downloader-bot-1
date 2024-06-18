@@ -49,13 +49,13 @@ Hello! I am a bot to download videos from terabox.
 Send me the terabox link and I will start downloading it.
 Join @RoldexVerse For Updates
 [Source Code](https://github.com/r0ld3x/terabox-downloader-bot) """
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
+        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @RoldexVerseChats then send me the link again."
+            "Please join @SK_MoviesOffl then send me the link again."
         )
     await event.reply(reply_text, link_preview=False, parse_mode="markdown")
 
@@ -70,13 +70,13 @@ Join @RoldexVerse For Updates
 async def start(event: UpdateNewMessage):
     text = event.pattern_match.group(1)
     fileid = db.get(str(text))
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
+        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @RoldexVerseChats then send me the link again."
+            "Please join @SK_MoviesOffl then send me the link again."
         )
     await bot(
         ForwardMessagesRequest(
@@ -122,13 +122,13 @@ async def handle_message(event: Message):
     url = get_urls_from_string(event.text)
     if not url:
         return await event.reply("Please enter a valid url.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
+        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @RoldexVerseChats then send me the link again."
+            "Please join @SK_MoviesOffl then send me the link again."
         )
     is_spam = db.get(event.sender_id)
     if is_spam and event.sender_id not in [1317173146]:
