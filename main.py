@@ -9,6 +9,7 @@ import telethon.tl.types
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import ForwardMessagesRequest
 from telethon.types import Message, UpdateNewMessage
+from aiohttp import web
 
 from cansend import CanSend
 from config import *
@@ -311,10 +312,27 @@ Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
         )
 
 
-# Start the bot and ensure it listens on the correct port
+# Aiohttp server for health check
+async def handle(request):
+    return web.Response(text="Bot is running")
+
+
+app = web.Application()
+app.add_routes([web.get("/", handle)])
+
 if __name__ == "__main__":
-    PORT = int(os.environ.get("PORT", 8000))
-    bot.start(bot_token=BOT_TOKEN)
-    print(f"Bot is running on port {PORT}...")
-    bot.run_until_disconnected()
+    loop = asyncio.get_event_loop()
+
+    # Start the bot
+    loop.run_until_complete(bot.start(bot_token=BOT_TOKEN))
+    print("Bot is running...")
+
+    # Run the web server
+    runner = web.AppRunner(app)
+    loop.run_until_complete(runner.setup())
+    site = web.TCPSite(runner, "0.0.0.0", PORT)
+    loop.run_until_complete(site.start())
+
+    # Keep the loop running
+    loop.run_forever()
     
