@@ -35,7 +35,6 @@ db = redis.Redis(
     decode_responses=True,
 )
 
-
 @bot.on(
     events.NewMessage(
         pattern="/start$",
@@ -59,7 +58,6 @@ Join @RoldexVerse For Updates
             "Please join @RoldexVerseChats then send me the link again."
         )
     await event.reply(reply_text, link_preview=False, parse_mode="markdown")
-
 
 @bot.on(
     events.NewMessage(
@@ -92,7 +90,6 @@ async def start(event: UpdateNewMessage):
         )
     )
 
-
 @bot.on(
     events.NewMessage(
         pattern="/remove (.*)",
@@ -109,7 +106,6 @@ async def remove(event: UpdateNewMessage):
     else:
         await event.reply(f"{user_id} is not in the list.")
 
-
 @bot.on(
     events.NewMessage(
         incoming=True,
@@ -121,7 +117,6 @@ async def remove(event: UpdateNewMessage):
 )
 async def get_message(event: Message):
     asyncio.create_task(handle_message(event))
-
 
 async def handle_message(event: Message):
     url = get_urls_from_string(event.text)
@@ -311,7 +306,6 @@ Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
             ex=7200,
         )
 
-
 # Aiohttp server for health check
 async def handle(request):
     return web.Response(text="Bot is running")
@@ -335,4 +329,4 @@ if __name__ == "__main__":
 
     # Keep the loop running
     loop.run_forever()
-    
+
