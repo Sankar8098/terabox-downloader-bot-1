@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import redis
 import telethon
-import telethon.tl.types
 from telethon import TelegramClient, events
 from telethon.tl.functions.messages import ForwardMessagesRequest
 from telethon.types import Message, UpdateNewMessage
@@ -314,19 +313,19 @@ async def handle(request):
 app = web.Application()
 app.add_routes([web.get("/", handle)])
 
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-
-    # Start the bot
-    loop.run_until_complete(bot.start(bot_token=BOT_TOKEN))
+async def main():
+    await bot.start(bot_token=BOT_TOKEN)
     print("Bot is running...")
 
     # Run the web server
     runner = web.AppRunner(app)
-    loop.run_until_complete(runner.setup())
+    await runner.setup()
     site = web.TCPSite(runner, "0.0.0.0", PORT)
-    loop.run_until_complete(site.start())
+    await site.start()
 
     # Keep the loop running
-    loop.run_forever()
+    await bot.run_until_disconnected()
+
+if __name__ == "__main__":
+    asyncio.run(main())
     
