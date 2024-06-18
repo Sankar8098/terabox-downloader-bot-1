@@ -49,13 +49,13 @@ Hello! I am a bot to download videos from terabox.
 Send me the terabox link and I will start downloading it.
 Join @RoldexVerse For Updates
 [Source Code](https://github.com/r0ld3x/terabox-downloader-bot) """
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     await event.reply(reply_text, link_preview=False, parse_mode="markdown")
 
@@ -70,13 +70,13 @@ Join @RoldexVerse For Updates
 async def start(event: UpdateNewMessage):
     text = event.pattern_match.group(1)
     fileid = db.get(str(text))
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await event.reply("Please join @SK_MoviesOffl then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     await bot(
         ForwardMessagesRequest(
@@ -122,13 +122,13 @@ async def handle_message(event: Message):
     url = get_urls_from_string(event.text)
     if not url:
         return await event.reply("Please enter a valid url.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
         return await event.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@SK_MoviesOffl", event.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
         return await event.reply(
-            "Please join @SK_MoviesOffl then send me the link again."
+            "Please join @RoldexVerseChats then send me the link again."
         )
     is_spam = db.get(event.sender_id)
     if is_spam and event.sender_id not in [1317173146]:
@@ -231,15 +231,13 @@ async def handle_message(event: Message):
             caption=f"""
 File Name: `{data['file_name']}`
 Size: **{data["size"]}** 
-Direct Link: [Click Here](https://t.me/Links_Bypasss_bot?start={uuid})
+Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
 
-@SK_MoviesOffl
+@RoldexVerse
 """,
             supports_streaming=True,
             spoiler=True,
         )
-
-        # pm2 start python3 --name "terabox" -- main.py
     except telethon.errors.rpcerrorlist.WebpageCurlFailedError:
         download = await download_file(
             data["direct_link"], data["file_name"], progress_bar
@@ -255,9 +253,9 @@ Direct Link: [Click Here](https://t.me/Links_Bypasss_bot?start={uuid})
             caption=f"""
 File Name: `{data['file_name']}`
 Size: **{data["size"]}** 
-Direct Link: [Click Here](https://t.me/Links_Bypasss_bot?start={uuid})
+Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
 
-@SK_MoviesOffl
+@RoldexVerse
 """,
             progress_callback=progress_bar,
             thumb=thumbnail if thumbnail else None,
@@ -306,11 +304,8 @@ Direct Link: [Click Here](https://t.me/Links_Bypasss_bot?start={uuid})
             ex=7200,
         )
 
-
-# Aiohttp server for health check
 async def handle(request):
     return web.Response(text="Bot is running")
-
 
 app = web.Application()
 app.add_routes([web.get("/", handle)])
@@ -319,7 +314,7 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
 
     # Start the bot
-    loop.run_until_complete(bot.start(bot_token=BOT_TOKEN))
+    loop.create_task(bot.start(bot_token=BOT_TOKEN))
     print("Bot is running...")
 
     # Run the web server
