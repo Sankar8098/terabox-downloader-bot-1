@@ -23,12 +23,14 @@ from tools import (
     is_user_on_chat,
 )
 
+# Initialize Telegram bot
 bot = TelegramClient("tele", API_ID, API_HASH)
 
+# Configure Redis
 db = redis.Redis(
-    host=HOST,
-    port=PORT,
-    password=PASSWORD,
+    host=REDIS_HOST,
+    port=REDIS_PORT,
+    password=REDIS_PASSWORD,
     decode_responses=True,
 )
 
@@ -41,21 +43,21 @@ db = redis.Redis(
         func=lambda x: x.is_private,
     )
 )
-async def start(m: UpdateNewMessage):
+async def start(event: UpdateNewMessage):
     reply_text = f"""
 Hello! I am a bot to download videos from terabox.
 Send me the terabox link and I will start downloading it.
 Join @RoldexVerse For Updates
 [Source Code](https://github.com/r0ld3x/terabox-downloader-bot) """
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", m.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await m.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", m.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
-        return await m.reply(
+        return await event.reply(
             "Please join @RoldexVerseChats then send me the link again."
         )
-    await m.reply(reply_text, link_preview=False, parse_mode="markdown")
+    await event.reply(reply_text, link_preview=False, parse_mode="markdown")
 
 
 @bot.on(
@@ -66,24 +68,23 @@ Join @RoldexVerse For Updates
         func=lambda x: x.is_private,
     )
 )
-async def start(m: UpdateNewMessage):
-    text = m.pattern_match.group(1)
+async def start(event: UpdateNewMessage):
+    text = event.pattern_match.group(1)
     fileid = db.get(str(text))
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", m.peer_id)
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await m.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", m.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
-        return await m.reply(
+        return await event.reply(
             "Please join @RoldexVerseChats then send me the link again."
         )
     await bot(
         ForwardMessagesRequest(
             from_peer=PRIVATE_CHAT_ID,
             id=[int(fileid)],
-            to_peer=m.chat.id,
+            to_peer=event.chat_id,
             drop_author=True,
-            # noforwards=True,  # Uncomment it if you dont want to forward the media.
             background=True,
             drop_media_captions=False,
             with_my_score=True,
@@ -99,13 +100,13 @@ async def start(m: UpdateNewMessage):
         from_users=ADMINS,
     )
 )
-async def remove(m: UpdateNewMessage):
-    user_id = m.pattern_match.group(1)
+async def remove(event: UpdateNewMessage):
+    user_id = event.pattern_match.group(1)
     if db.get(f"check_{user_id}"):
         db.delete(f"check_{user_id}")
-        await m.reply(f"Removed {user_id} from the list.")
+        await event.reply(f"Removed {user_id} from the list.")
     else:
-        await m.reply(f"{user_id} is not in the list.")
+        await event.reply(f"{user_id} is not in the list.")
 
 
 @bot.on(
@@ -117,28 +118,27 @@ async def remove(m: UpdateNewMessage):
         and message.is_private,
     )
 )
-async def get_message(m: Message):
-    asyncio.create_task(handle_message(m))
+async def get_message(event: Message):
+    asyncio.create_task(handle_message(event))
 
 
-async def handle_message(m: Message):
-
-    url = get_urls_from_string(m.text)
+async def handle_message(event: Message):
+    url = get_urls_from_string(event.text)
     if not url:
-        return await m.reply("Please enter a valid url.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerse", m.peer_id)
+        return await event.reply("Please enter a valid url.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerse", event.peer_id)
     if not check_if:
-        return await m.reply("Please join @RoldexVerse then send me the link again.")
-    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", m.peer_id)
+        return await event.reply("Please join @RoldexVerse then send me the link again.")
+    check_if = await is_user_on_chat(bot, "@RoldexVerseChats", event.peer_id)
     if not check_if:
-        return await m.reply(
+        return await event.reply(
             "Please join @RoldexVerseChats then send me the link again."
         )
-    is_spam = db.get(m.sender_id)
-    if is_spam and m.sender_id not in [1317173146]:
-        return await m.reply("You are spamming. Please wait a 1 minute and try again.")
-    hm = await m.reply("Sending you the media wait...")
-    count = db.get(f"check_{m.sender_id}")
+    is_spam = db.get(event.sender_id)
+    if is_spam and event.sender_id not in [1317173146]:
+        return await event.reply("You are spamming. Please wait a 1 minute and try again.")
+    hm = await event.reply("Sending you the media wait...")
+    count = db.get(f"check_{event.sender_id}")
     if count and int(count) > 5:
         return await hm.edit(
             "You are limited now. Please come back after 2 hours or use another account."
@@ -157,17 +157,16 @@ async def handle_message(m: Message):
             ForwardMessagesRequest(
                 from_peer=PRIVATE_CHAT_ID,
                 id=[int(fileid)],
-                to_peer=m.chat.id,
+                to_peer=event.chat_id,
                 drop_author=True,
-                # noforwards=True, #Uncomment it if you dont want to forward the media.
                 background=True,
                 drop_media_captions=False,
                 with_my_score=True,
             )
         )
-        db.set(m.sender_id, time.monotonic(), ex=60)
+        db.set(event.sender_id, time.monotonic(), ex=60)
         db.set(
-            f"check_{m.sender_id}",
+            f"check_{event.sender_id}",
             int(count) + 1 if count else 1,
             ex=7200,
         )
@@ -177,7 +176,7 @@ async def handle_message(m: Message):
     data = get_data(url)
     if not data:
         return await hm.edit("Sorry! API is dead or maybe your link is broken.")
-    db.set(m.sender_id, time.monotonic(), ex=60)
+    db.set(event.sender_id, time.monotonic(), ex=60)
     if (
         not data["file_name"].endswith(".mp4")
         and not data["file_name"].endswith(".mkv")
@@ -187,7 +186,7 @@ async def handle_message(m: Message):
         return await hm.edit(
             f"Sorry! File is not supported for now. I can download only .mp4, .mkv and .webm files."
         )
-    if int(data["sizebytes"]) > 524288000 and m.sender_id not in [1317173146]:
+    if int(data["sizebytes"]) > 524288000 and event.sender_id not in [1317173146]:
         return await hm.edit(
             f"Sorry! File is too big. I can download only 500MB and this file is of {data['size']} ."
         )
@@ -196,7 +195,6 @@ async def handle_message(m: Message):
     cansend = CanSend()
 
     async def progress_bar(current_downloaded, total_downloaded, state="Sending"):
-
         if not cansend.can_send():
             return
         bar_length = 20
@@ -297,22 +295,26 @@ Direct Link: [Click Here](https://t.me/teraboxdown_bot?start={uuid})
             ForwardMessagesRequest(
                 from_peer=PRIVATE_CHAT_ID,
                 id=[file.id],
-                to_peer=m.chat.id,
-                top_msg_id=m.id,
+                to_peer=event.chat_id,
+                top_msg_id=event.id,
                 drop_author=True,
-                # noforwards=True,  #Uncomment it if you dont want to forward the media.
                 background=True,
                 drop_media_captions=False,
                 with_my_score=True,
             )
         )
-        db.set(m.sender_id, time.monotonic(), ex=60)
+        db.set(event.sender_id, time.monotonic(), ex=60)
         db.set(
-            f"check_{m.sender_id}",
+            f"check_{event.sender_id}",
             int(count) + 1 if count else 1,
             ex=7200,
         )
 
 
-bot.start(bot_token=BOT_TOKEN)
-bot.run_until_disconnected()
+# Start the bot and ensure it listens on the correct port
+if __name__ == "__main__":
+    PORT = int(os.environ.get("PORT", 8000))
+    bot.start(bot_token=BOT_TOKEN)
+    print(f"Bot is running on port {PORT}...")
+    bot.run_until_disconnected()
+    
